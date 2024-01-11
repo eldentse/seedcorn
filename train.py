@@ -32,12 +32,8 @@ def main(args):
         dataset_folder=args.dataset_folder, 
         split=args.train_split,
         split_ratio=args.split_ratio,
-        apply_PCA=args.apply_PCA,
-        PCA_variance=args.PCA_variance,
         split_type=args.split_type,
-        path_to_txt=exp_id,
-        remove_outliers=args.remove_outliers,
-        outliers_threshold=args.outliers_threshold
+        path_to_txt=exp_id
         )
     
     trainloader = torch.utils.data.DataLoader(
@@ -193,7 +189,7 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser() 
     parser.add_argument('--experiment_tag', default='hello') 
-    parser.add_argument('--dataset_folder', default='data/dataset_clean.csv')
+    parser.add_argument('--dataset_folder', default='/media/eldentse94/Elements/PhD/MEG-ASD/ConnMatPCA/')
     parser.add_argument('--cache_folder', default='checkpoints/')
     parser.add_argument('--resume_path', default=None)
 
@@ -201,13 +197,9 @@ if __name__ == "__main__":
     parser.add_argument("--train_split", 
                         default="train", choices=["test", "train"])
     parser.add_argument("--split_ratio", type=float, default=0.3)
-    parser.add_argument('--apply_PCA', default=True, help="Apply PCA for preprocessing") 
-    parser.add_argument("--PCA_variance", type=float, default=0.9)
     parser.add_argument("--split_type", 
                         default="base", 
                         help="Detailed implementation of split type can be found in dataset_factory")
-    parser.add_argument("--remove_outliers", action="store_true")
-    parser.add_argument("--outliers_threshold", type=float, default=0.5)
     
     # Training parameters
     parser.add_argument("--train_cont", 
@@ -234,8 +226,6 @@ if __name__ == "__main__":
 
     # Loss
     parser.add_argument("--loss_function", default="ce", choices=['l1', 'l2', 'ce'])
-    parser.add_argument("--weight_SUMINS", type=float, default= 0.5)
-    parser.add_argument("--weight_FILENAME", type=float, default= 0.5)
 
     args = parser.parse_args()
     for key, val in sorted(vars(args).items(), key=lambda x: x[0]):
