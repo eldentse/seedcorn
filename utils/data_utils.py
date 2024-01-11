@@ -1,18 +1,6 @@
 import numpy as np
 import pandas as pd
 
-def count_unique_policy_num(df):
-  """
-  Wraper for computing number of unique policy
-
-  Args:
-    df: can be any dataframe
-  Returns:
-    no. of unique policy (int)
-
-  """
-  return df['CHDRNUM'].nunique()
-
 
 def to_categorical(y, num_classes=None, dtype="float32"):
     """
@@ -73,38 +61,6 @@ def unique_class_idx(label_column):
   """Return the indices of unique classes"""
   temp = to_categorical(label_column)
   return np.where(np.sum(temp, axis=0) == 1)[0]
-
-
-def filename_remap(lookup_values, y):
-  """Group filaname class"""
-  mapping = {'ZSULINK':'Link',
-             'ZSTERM':'Term',
-             'ZSPAR':'Par',
-             'ZSANN':'Ann',
-             'ZSNONPAR':'NonPar',
-             'ZSPARANN':'Ann',
-             'ZSPARJ':'Par',
-             'ZBPAR':'Par',
-             'ZBNONPAR':'NonPar',
-             'ZBCBP':'BP',
-             'ZBCBP2':'BP',
-             'ZBTERM':'Term',
-             'ZSCBP':'BP',
-             'ZSCBP2':'BP'
-             }
-
-  name_to_idx = {'Link'  :0,
-                 'Term'  :1, 
-                 'Par'   :2, 
-                 'Ann'   :3, 
-                 'NonPar':4, 
-                 'BP'    :5
-                 }
-  
-  for i, name in enumerate(lookup_values):
-        lookup_values[i] = mapping[name]
-        y[i] = name_to_idx[mapping[name]]
-  return lookup_values, y
 
 
 def to_bin_column(data, num_bins, binning_method):
