@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 from utils.model_utils import load_checkpoint
 from utils.eval_utils import ClassificationEvaluator, AverageMeters
-from data.queries import BaseQueries
+# from data.queries import BaseQueries
 
 
 def set_all_seeds(seed):

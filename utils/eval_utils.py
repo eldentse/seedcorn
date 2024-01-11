@@ -2,8 +2,8 @@ import numpy as np
 from utils.common_utils import torch2numpy
 from sklearn.metrics import confusion_matrix, classification_report, top_k_accuracy_score
 import pandas as pd
-import seaborn as sn
-from matplotlib import pyplot as plt
+# import seaborn as sn
+# from matplotlib import pyplot as plt
 import plotly.express as px
 from PIL import Image
 import io
