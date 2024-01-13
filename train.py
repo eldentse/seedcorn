@@ -1,14 +1,15 @@
 import argparse
 from datetime import datetime
 
-from matplotlib import pyplot as plt
+# from matplotlib import pyplot as plt
 import torch
 import torch.nn as nn
 from tqdm import tqdm
-from torch.utils.tensorboard import SummaryWriter
+# from torch.utils.tensorboard import SummaryWriter
 
-from utils import train_utils, argutils, dataset_utils, common_utils, model_utils
+from utils import train_utils, argutils, common_utils, model_utils
 from models import model_factory
+from data import data_factory
 
 
 def main(args):
@@ -23,33 +24,19 @@ def main(args):
 
     # Initialise local checkpoint folder
     argutils.save_args(args, exp_id, "opt")
-    board_writer = SummaryWriter(log_dir=exp_id) 
+    # board_writer = SummaryWriter(log_dir=exp_id) 
 
     # Initialise training dataset
     print("Get datset split", args.train_split)
 
-    train_dataset, test_dataset, data_helper = dataset_utils.get_dataset(
+    train_dataset, test_dataset = data_factory.get_dataset(
         dataset_folder=args.dataset_folder, 
         split=args.train_split,
         split_ratio=args.split_ratio,
         split_type=args.split_type,
         path_to_txt=exp_id
         )
-    
-    trainloader = torch.utils.data.DataLoader(
-        train_dataset, 
-        batch_size=args.batch_size, 
-        shuffle=True, 
-        num_workers=args.workers
-        )
-    
-    # Initialise testing dataset    
-    testloader = torch.utils.data.DataLoader(
-        test_dataset, 
-        batch_size=args.batch_size, 
-        shuffle=False, 
-        num_workers=args.workers
-        )
+
     
     # Initialise model
     print("Get model", args.model)
@@ -189,7 +176,7 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser() 
     parser.add_argument('--experiment_tag', default='hello') 
-    parser.add_argument('--dataset_folder', default='/media/eldentse94/Elements/PhD/MEG-ASD/ConnMatPCA/')
+    parser.add_argument('--dataset_folder', default='/home/eldentse94/Documents/VSCodeProjects/SeedCorn/data')
     parser.add_argument('--cache_folder', default='checkpoints/')
     parser.add_argument('--resume_path', default=None)
 
