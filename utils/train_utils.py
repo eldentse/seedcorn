@@ -8,7 +8,6 @@ from tqdm import tqdm
 from sklearn import metrics
 
 from utils.model_utils import load_checkpoint
-from utils.eval_utils import ClassificationEvaluator, AverageMeters
 # from data.queries import BaseQueries
 
 
@@ -65,6 +64,7 @@ def get_accuracy(y_true, y_prob):
     accuracy = metrics.accuracy_score(y_true, y_prob)
     return accuracy
 
+
 def train(dataset, model, optimizer, loss_fn):
     loss_total = 0
     preds = []
@@ -86,6 +86,7 @@ def train(dataset, model, optimizer, loss_fn):
     acc = get_accuracy(labels, preds)
     return model, optimizer, loss_total, acc
     
+
 def val(dataset, model, loss_fn):
     loss_total = 0
     preds = []

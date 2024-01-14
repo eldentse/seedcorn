@@ -3,10 +3,6 @@ from datetime import datetime
 
 # from matplotlib import pyplot as plt
 import torch
-import torch.nn as nn
-from tqdm import tqdm
-from sklearn import metrics
-import numpy as np
 # from torch.utils.tensorboard import SummaryWriter
 
 from utils import train_utils, argutils, common_utils, model_utils
@@ -85,9 +81,9 @@ def main(args):
     print(f"{train_dataset.snapshot_count} Training Data Points | {test_dataset.snapshot_count} Validation Data Points")
     for epoch in range(args.epochs):
         model, optimizer, train_loss_total, train_acc = train_utils.train(train_dataset, 
-                                                              model, 
-                                                              optimizer,
-                                                              loss_fn)
+                                                                        model, 
+                                                                        optimizer,
+                                                                        loss_fn)
         model, val_loss_total, val_acc = train_utils.val(test_dataset, 
                                                         model,
                                                         loss_fn)
