@@ -29,7 +29,7 @@ def main(args):
     # Initialise training dataset
     print("Get datset split", args.train_split)
 
-    train_dataset, test_dataset = data_factory.get_dataset(
+    train_dataset, test_dataset, data_helper = data_factory.get_dataset(
         dataset_folder=args.dataset_folder, 
         split=args.train_split,
         split_ratio=args.split_ratio,
@@ -42,9 +42,8 @@ def main(args):
     print("Get model", args.model)
     model = model_factory.get_model(
         model_name=args.model, 
-        dims=data_helper.dims,
-        dropout=args.dropout,
-        multi_task=data_helper.multi_task
+        dims=data_helper,
+        dropout=args.dropout
         )
     model.to(torch.double)
 
@@ -208,7 +207,7 @@ if __name__ == "__main__":
     parser.add_argument("--use_GPU", default=False)
 
     # Model
-    parser.add_argument("--model", default="MLP")
+    parser.add_argument("--model", default="STGCN")
     parser.add_argument("--dropout", default=0.1)
 
     # Loss
