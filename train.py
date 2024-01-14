@@ -45,7 +45,10 @@ def main(args):
         dims=data_helper,
         dropout=args.dropout
         )
-    model.to(torch.double)
+
+    ## For checks only
+    # input = next(iter(train_dataset))
+    # output = model(input.x, input.edge_index, input.edge_weight)
 
     # Resume training
     if args.train_cont:

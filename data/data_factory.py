@@ -43,10 +43,10 @@ def get_dataset(dataset_folder, split, split_ratio, split_type, path_to_txt):
                 key = filename.split('_')[-1].split('.')[0]
                 if key == '01':
                     label = 0
-                    temporal_data_01 = npy2temporal(data, label)
+                    temporal_data_01, data_helper = npy2temporal(data, label)
                 elif key == '02':
                     label = 1
-                    temporal_data_02 = npy2temporal(data, label)
+                    temporal_data_02, data_helper = npy2temporal(data, label)
                 else:
                     assert False, 'Class should be binary!'
 
@@ -60,7 +60,7 @@ def get_dataset(dataset_folder, split, split_ratio, split_type, path_to_txt):
 
 
     if split == "train":
-        return train_dataset, test_dataset
+        return train_dataset, test_dataset, data_helper
     if split == "test":
         assert False, "We return testing split together with training split"
     if split == "val":
@@ -92,8 +92,10 @@ def npy2temporal(input_data, label):
             target_seq[i,j] = one_hot_encode(label, num_classes)
     
     dataset = DynamicGraphTemporalSignal(edge_index_seq, edge_attr_seq, node_features_seq, target_seq)
-           
-    return dataset 
+
+    data_helper = [num_nodes, num_nodes, num_classes]
+
+    return dataset, data_helper
 
 
 def adj2coo(adj_matrix):

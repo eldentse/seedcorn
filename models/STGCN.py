@@ -8,7 +8,7 @@ class STGCN(torch.nn.Module):
         super(STGCN, self).__init__()
         self.recurrent = STConv(num_nodes, node_features, hidden_channels=32, out_channels=32, kernel_size=3, K=1)
         self.recurrent1 = STConv(num_nodes, 32, hidden_channels=32, out_channels=32, kernel_size=3, K=1)
-        self.linear = torch.nn.Linear(7, num_classes)
+        self.linear = torch.nn.Linear(13, num_classes)
         self.drop_out = torch.nn.Dropout(0.5)
 
     def forward(self, x, edge_index, edge_weight):
