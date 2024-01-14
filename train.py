@@ -5,6 +5,8 @@ from datetime import datetime
 import torch
 import torch.nn as nn
 from tqdm import tqdm
+from sklearn import metrics
+import numpy as np
 # from torch.utils.tensorboard import SummaryWriter
 
 from utils import train_utils, argutils, common_utils, model_utils
@@ -75,104 +77,23 @@ def main(args):
     # Number of parameters
     print("Numbers of parameters to update:", model_utils.count_parameters(model))
 
-    # Optimise unfrozen parts of the network
-    model_params = filter(lambda p: p.requires_grad, model.parameters())   
 
-    # Initialise optimiser
-    if args.optimizer == "adam":
-        optimizer = torch.optim.Adam(
-            model_params, lr=args.lr, weight_decay=args.weight_decay
-            )
-    elif args.optimizer == "sgd":
-        optimizer = torch.optim.SGD(
-            model_params, lr=args.lr, momentum=args.momentum,
-            weight_decay=args.weight_decay
-            )
-    
-    if args.lr_decay_gamma:
-        scheduler = torch.optim.lr_scheduler.StepLR(
-            optimizer, args.lr_decay_step, gamma=args.lr_decay_gamma
-            )
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    loss_fn = torch.nn.BCEWithLogitsLoss()
 
 
-    if args.train_cont:
-        train_utils.reload_optimizer(
-            args.resume_path,optimizer,scheduler
-            )
-    
-    # Get loss function
-    loss_function = common_utils.loss_str2func()[args.loss_function]
-
-    for epoch in tqdm(range(start_epoch, args.epochs+1), desc="epoch"):
-        print(f"***Epoch #{epoch}")
-        train_utils.epoch_pass(
-            trainloader,
-            model,
-            loss_function,
-            data_helper,
-            train=True,
-            optimizer=optimizer,
-            scheduler=scheduler,
-            lr_decay_gamma=args.lr_decay_gamma,
-            use_GPU=args.use_GPU,
-            use_multiple_gpu=use_multiple_gpu,
-            tensorboard_writer=board_writer,
-            is_demo=False,
-            epoch=epoch,
-            freeze_batchnorm=args.freeze_batch_norm,
-            path_to_png=exp_id,
-            weight_SUMINS=args.weight_SUMINS,
-            weight_FILENAME=args.weight_FILENAME
-            )
-
-        if epoch%args.snapshot == 0:
-            print("Forward pass testing split")
-            _, test_avg_meters = train_utils.epoch_pass(
-                testloader,
-                model,
-                loss_function,
-                data_helper,
-                train=False,
-                optimizer=optimizer,
-                scheduler=scheduler,
-                lr_decay_gamma=args.lr_decay_gamma,
-                use_GPU=args.use_GPU,
-                use_multiple_gpu=use_multiple_gpu,
-                tensorboard_writer=board_writer,
-                is_demo=False,
-                epoch=epoch,
-                freeze_batchnorm=args.freeze_batch_norm,
-                path_to_png=exp_id,
-                weight_SUMINS=args.weight_SUMINS,
-                weight_FILENAME=args.weight_FILENAME
-                )
-            
-            test_dict = {
-                meter_name: meter.avg
-                for meter_name, meter in test_avg_meters.average_meters.items()
-                }
-            best_metric = list(test_dict.keys())[0]
-            if best_score is None:
-                best_score = test_dict[best_metric]
-            is_best = test_dict[best_metric] < best_score
-            best_score = min(test_dict[best_metric], best_score)
+    print(f"{train_dataset.snapshot_count} Training Data Points | {test_dataset.snapshot_count} Validation Data Points")
+    for epoch in range(args.epochs):
+        model, optimizer, train_loss_total, train_acc = train_utils.train(train_dataset, 
+                                                              model, 
+                                                              optimizer,
+                                                              loss_fn)
+        model, val_loss_total, val_acc = train_utils.val(test_dataset, 
+                                                        model,
+                                                        loss_fn)
+        print(f"EPOCH: {epoch}/{args.epochs} | TRAIN LOSS: {train_loss_total:.2f} | TRAIN ACC: {train_acc:.2f} | VAL LOSS: {val_loss_total:.2f} | VAL ACC: {val_acc:.2f}")
 
 
-            if args.experiment_tag != 'debug':
-                model_utils.save_checkpoint(
-                    {
-                        "epoch": epoch, 
-                        "network": args.model,
-                        "state_dict": model.module.state_dict() if use_multiple_gpu else model.state_dict(),
-                        "optimizer": optimizer.state_dict(),
-                        "scheduler": scheduler,
-                    },
-                    is_best=is_best,
-                    checkpoint=exp_id,
-                    snapshot=args.snapshot
-                    )
-
-    board_writer.close()
 
 
 if __name__ == "__main__":
